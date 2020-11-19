@@ -4,8 +4,8 @@
 	# Custom Function For Identifikasi
 	function Identifikasi($param)
 	{
-		$b = mysql_query("SELECT pertanyaan FROM tbl_identifikasi WHERE id_identifikasi='$param'");
-		$d = mysql_fetch_array($b);
+		$b = $mysqli -> query("SELECT pertanyaan FROM tbl_identifikasi WHERE id_identifikasi='$param'");
+		$d = mysqli_fetch_array($b);
 		$return = $d['pertanyaan'];
 		return $return;
 	}
@@ -19,30 +19,30 @@
 		* License:   GPL v2 or BSD (3-point)
 	*/
 	mb_internal_encoding('UTF-8');
-	
+
 	/**
 		* Array of database columns which should be read and sent back to DataTables. Use a space where
 		* you want to insert a non-database field (for example a counter or static image)
 	*/
 	$aColumns = array( 'id_aturan_ya','satu','dua'); //Kolom Pada Tabel
-	
+
 	$sIndexColumn = 'id_aturan_ya';
-	
+
 	// DB table to use
-	$sTable = 'tbl_aturan_ya'; 
-	
+	$sTable = 'tbl_aturan_ya';
+
 	// Database connection information
 	$gaSql['user']     = $user;
-	$gaSql['password'] = $pwd;   
+	$gaSql['password'] = $pwd;
 	$gaSql['db']       = $db;
-	$gaSql['server']   = $host;   
+	$gaSql['server']   = $host;
 	$gaSql['port']     = 3306;
 
 	// Input method (use $_GET, $_POST or $_REQUEST)
 	$input =& $_POST;
 
 	$gaSql['charset']  = 'utf8';
-	
+
 	/**
 		* MySQL connection
 	*/
@@ -50,12 +50,12 @@
 	if (mysqli_connect_error()) {
 		die( 'Error connecting to MySQL server (' . mysqli_connect_errno() .') '. mysqli_connect_error() );
 	}
-	
+
 	if (!$db->set_charset($gaSql['charset'])) {
 		die( 'Error loading character set "'.$gaSql['charset'].'": '.$db->error );
 	}
-	
-	
+
+
 	/**
 		* Paging
 	*/
@@ -63,8 +63,8 @@
 	if ( isset( $input['iDisplayStart'] ) && $input['iDisplayLength'] != '-1' ) {
 		$sLimit = " LIMIT ".intval( $input['iDisplayStart'] ).", ".intval( $input['iDisplayLength'] );
 	}
-	
-	
+
+
 	/**
 		* Ordering
 	*/
@@ -79,14 +79,14 @@
 			}
 		}
 	}
-	
+
 	if (!empty($aOrderingRules)) {
 		$sOrder = " ORDER BY ".implode(", ", $aOrderingRules);
 		} else {
 		$sOrder = "";
 	}
-	
-	
+
+
 	/**
 		* Filtering
 		* NOTE this does not match the built-in DataTables filtering which does it
@@ -94,7 +94,7 @@
 		* on very large tables, and MySQL's regex functionality is very limited
 	*/
 	$iColumnCount = count($aColumns);
-	
+
 	if ( isset($input['sSearch']) && $input['sSearch'] != "" ) {
 		$aFilteringRules = array();
 		for ( $i=0 ; $i<$iColumnCount ; $i++ ) {
@@ -106,21 +106,21 @@
 			$aFilteringRules = array('('.implode(" OR ", $aFilteringRules).')');
 		}
 	}
-	
+
 	// Individual column filtering
 	for ( $i=0 ; $i<$iColumnCount ; $i++ ) {
 		if ( isset($input['bSearchable_'.$i]) && $input['bSearchable_'.$i] == 'true' && $input['sSearch_'.$i] != '' ) {
 			$aFilteringRules[] = "`".$aColumns[$i]."` LIKE '%".$db->real_escape_string($input['sSearch_'.$i])."%'";
 		}
 	}
-	
+
 	if (!empty($aFilteringRules)) {
 		$sWhere = " WHERE ".implode(" AND ", $aFilteringRules);
 		} else {
 		$sWhere = "";
 	}
-	
-	
+
+
 	/**
 		* SQL queries
 		* Get data to display
@@ -131,24 +131,24 @@
 			$aQueryColumns[] = $col;
 		}
 	}
-	
+
 	$sQuery = "
     SELECT SQL_CALC_FOUND_ROWS `".implode("`, `", $aQueryColumns)."`
     FROM `".$sTable."`".$sWhere.$sOrder.$sLimit;
-	
+
 	$rResult = $db->query( $sQuery ) or die($db->error);
-	
+
 	// Data set length after filtering
 	$sQuery = "SELECT FOUND_ROWS()";
 	$rResultFilterTotal = $db->query( $sQuery ) or die($db->error);
 	list($iFilteredTotal) = $rResultFilterTotal->fetch_row();
-	
+
 	// Total data set length
 	$sQuery = "SELECT COUNT(`".$sIndexColumn."`) FROM `".$sTable."`";
 	$rResultTotal = $db->query( $sQuery ) or die($db->error);
 	list($iTotal) = $rResultTotal->fetch_row();
-	
-	
+
+
 	/**
 		* Output
 	*/
@@ -158,7 +158,7 @@
     "iTotalDisplayRecords" => $iFilteredTotal,
     "aaData"               => array(),
 	);
-	
+
 	// Looping Data
 	while ( $aRow = $rResult->fetch_assoc() ) {
 		$row = array();
@@ -169,7 +169,7 @@
 		$row = array( $btn, $aRow['dua'].' | '.Identifikasi($aRow['dua']), $aRow['satu'].' | '.Identifikasi($aRow['satu']));
 		$output['aaData'][] = $row;
 	}
-	
+
 	echo json_encode( $output );
-	
+
 ?>

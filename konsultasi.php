@@ -1,7 +1,7 @@
 	<?php
-
+    include 'config.php';
 	# Truncate Table For Start Consultation
-	$sql = mysql_query("TRUNCATE TABLE tbl_temp");
+	$sql = $mysqli -> query ("TRUNCATE TABLE tbl_temp");
 	echo "
 	<div class='col-xs-12 col-md-12'>
 			<div class='row'>
@@ -67,10 +67,10 @@
 						<script type="text/javascript">
 						$(document).ready(function(){
 
-							// Function Load 
+							// Function Load
 							Question();
 
-							
+
 						});
 							function Question(id)
 							{
@@ -132,7 +132,7 @@
 									data: formData,
 									success: function(data) {
 										Question(data);
-										waitingDialog.hide();	
+										waitingDialog.hide();
 									}
 								});
 							}
@@ -142,5 +142,5 @@
 								window.location='cetak-pdf?<?php echo md5(date("YmdHis"));?>';
 									return (false);
 							}
-						
+
 						</script>

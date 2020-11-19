@@ -23,10 +23,10 @@
 												# Start : Execute Button Login
 												if($p_login){
 													$param1=$_POST[param1];
-													$param2=MD5($_POST[param2]);
+													$param2=$_POST[param2];
 
 													echo "<div class='alert alert-danger' style='padding:8px'>";
-													$hasil=mysql_query("SELECT id_pengguna as uid, nm_lengkap
+													$hasil= $mysqli -> query("SELECT id_pengguna as uid, nm_lengkap
 														FROM tbl_pengguna WHERE nm_pengguna='$param1' AND sandi='$param2'");
 													if(mysql_num_rows($hasil)>0){
 														$row = mysql_fetch_array($hasil);
@@ -43,7 +43,7 @@
 													echo "</div>";
 												}
 												# End : Execute Button Login
-												
+
 												echo"<div class='form-group'>
 													<label>Nama Pengguna</label>
 													<input type='text' class='form-control' name='param1' placeholder='Masukkan Nama Pengguna' required>
